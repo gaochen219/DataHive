@@ -10,7 +10,7 @@ const ACCOUNTS = [
   { name: 'Andy730', fakeid: 'Mzg3MDY0OTQ0NA==' },
   { name: '逛逛GitHub', fakeid: 'MzUxNjg4NDEzNA==' },
   { name: 'Tech星球', fakeid: 'MzU5MTczNjIyNA==' },
-  // AI潮局面 待确认(搜索匹配到"椒图AI"), 确认后再加
+  { name: 'AI潮局', fakeid: 'MzI1MjE2NzAzMA==' },
 ];
 
 for (const a of ACCOUNTS) {
