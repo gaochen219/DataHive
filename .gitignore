@@ -41,3 +41,7 @@ private/
 id_rsa*
 *.p12
 
+# 微信登录态 / 二维码（敏感，绝不提交）
+.wechat-session.json
+.wechat-qr.png
+
