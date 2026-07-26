@@ -29,7 +29,7 @@ export async function buildAiDigest(opts: { sinceHours?: number; max?: number } 
   const rows = await query<any[]>(
     `SELECT title, source_name, url, summary, DATE_FORMAT(published_at,'%Y-%m-%d %H:%i') AS pub
      FROM content_item
-     WHERE source_type='rss' AND published_at >= DATE_SUB(NOW(), INTERVAL ? HOUR)
+     WHERE source_type IN ('rss','wechat') AND published_at >= DATE_SUB(NOW(), INTERVAL ? HOUR)
      ORDER BY published_at DESC LIMIT 60`,
     [sinceHours],
   );
