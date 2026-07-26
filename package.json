@@ -26,6 +26,7 @@
     "@vueuse/nuxt": "^10.11.0",
     "ag-grid-enterprise": "^34.0.0",
     "ali-oss": "^6.23.0",
+    "rss-parser": "^3.13.0",
     "ag-grid-vue3": "^34.0.0",
     "cheerio": "^1.1.2",
     "date-fns": "^4.1.0",
@@ -59,6 +60,7 @@
     "@types/turndown": "^5.0.5",
     "prettier": "^3.5.2",
     "tailwindcss-debug-screens": "^2.2.1",
+    "tsx": "^4.19.0",
     "typescript": "^5.5.3"
   },
   "engines": {
