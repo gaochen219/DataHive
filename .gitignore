@@ -28,3 +28,16 @@ docs
 
 # wrangler
 .wrangler
+
+# 本地私有/示例素材（竞品情报、样例数据等，勿推公开仓库）
+private/
+*mmwebwx*
+*.local.*
+
+# 密钥/私钥（绝不提交）
+*.pem
+*.key
+*.ppk
+id_rsa*
+*.p12
+
