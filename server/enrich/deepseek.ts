@@ -17,7 +17,7 @@ export async function deepseekChat(
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` },
     body: JSON.stringify({
-      model: opts.model || 'deepseek-chat',
+      model: opts.model || process.env.DEEPSEEK_MODEL || 'deepseek-v4-flash',
       messages,
       temperature: opts.temperature ?? 0.3,
       ...(opts.json ? { response_format: { type: 'json_object' } } : {}),
