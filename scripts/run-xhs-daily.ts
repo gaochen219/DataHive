@@ -10,13 +10,14 @@ import { pushWeChat } from '../server/deliver/serverchan';
 import { closePool } from '../server/storage/db';
 
 const N = Number(process.argv[2]) || 5;
+const OFFSET = Number(process.argv[3]) || 0; // 跳过前 N 篇(避开已发的)
 const date = new Date().toISOString().slice(0, 10);
 const daySeed = Math.floor(Date.now() / 86400000);
 const FOOTER = '@山海与书 · 每日治愈';
 const OUT = '/opt/datahive/xhs-out';
 mkdirSync(OUT, { recursive: true });
 
-const items = await recentHealingItems(N);
+const items = await recentHealingItems(N, OFFSET);
 console.log(`取 ${items.length} 篇疗愈内容，生成笔记+封面+正文图...`);
 
 const cards: DraftCard[] = [];

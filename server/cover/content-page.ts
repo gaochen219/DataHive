@@ -10,6 +10,13 @@ function esc(s: string): string {
   return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+// 书页里去掉 emoji(宋体渲染成方块)，保持纯净文字；emoji 留给标题
+function stripEmoji(s: string): string {
+  return String(s || '')
+    .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE00}-\u{FE0F}\u{1F1E6}-\u{1F1FF}\u{200D}\u{2190}-\u{21FF}]/gu, '')
+    .replace(/[ \t]{2,}/g, ' ');
+}
+
 interface Paper {
   name: string;
   bg: string;
@@ -33,7 +40,7 @@ export async function renderContentPages(
   const maxLines = Math.floor((H - TOP - 180) / lh);
 
   // 段落 → 行(段间插空行)
-  const paras = body.split(/\n+/).map((p) => p.trim()).filter(Boolean);
+  const paras = stripEmoji(body).split(/\n+/).map((p) => p.trim()).filter(Boolean);
   const items: string[] = [];
   paras.forEach((p, pi) => {
     if (pi > 0) items.push('');

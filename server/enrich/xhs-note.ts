@@ -59,11 +59,13 @@ export async function makeXhsNote(item: {
 // 取最近的疗愈内容(用于生成笔记)
 export async function recentHealingItems(
   limit = 3,
+  offset = 0,
 ): Promise<Array<{ title: string; summary: string; url: string; image_url: string | null }>> {
   const n = Math.max(1, Math.min(Math.floor(limit), 10));
+  const off = Math.max(0, Math.floor(offset));
   return query<any[]>(
     `SELECT title, summary, url, image_url FROM content_item
      WHERE source_id='healing-daily' AND summary IS NOT NULL AND CHAR_LENGTH(summary) > 60
-     ORDER BY published_at DESC LIMIT ${n}`,
+     ORDER BY published_at DESC LIMIT ${n} OFFSET ${off}`,
   );
 }
