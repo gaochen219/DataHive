@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS content_item (
   comment_count   INT          DEFAULT NULL,
   content_oss_key VARCHAR(512) DEFAULT NULL COMMENT '正文HTML快照在OSS的key',
   content_text    MEDIUMTEXT   DEFAULT NULL COMMENT '纯文本正文(全文检索用,可空)',
+  image_url       VARCHAR(1024) DEFAULT NULL COMMENT '配图URL(封面背景用)',
   status          TINYINT      NOT NULL DEFAULT 1 COMMENT '1正常/0隐藏/-1删除',
   fetched_at      DATETIME     DEFAULT NULL,
   created_at      DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,

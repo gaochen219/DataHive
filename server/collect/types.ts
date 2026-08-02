@@ -18,6 +18,7 @@ export interface RawItem {
   lang?: string | null;
   html?: string | null; // 正文 HTML 快照 → 存 OSS
   text?: string | null; // 纯文本正文
+  image?: string | null; // 配图 URL(封面背景用)
   metrics?: { read?: number; like?: number; share?: number; comment?: number };
   media?: RawMedia[];
   raw?: any; // 原始载荷备查

@@ -6,7 +6,24 @@ import type { SourceAdapter, SourceConfig, RawItem } from '../types';
 const parser = new Parser({
   timeout: 15000,
   headers: { 'User-Agent': 'Mozilla/5.0 (compatible; DataHive/0.1)' },
+  customFields: {
+    item: [
+      ['media:content', 'mediaContent', { keepArray: true }],
+      ['media:thumbnail', 'mediaThumbnail'],
+    ],
+  },
 });
+
+function extractImage(it: any): string | null {
+  if (it.enclosure?.url && /\.(jpg|jpeg|png|webp)/i.test(it.enclosure.url)) return it.enclosure.url;
+  if (Array.isArray(it.mediaContent)) {
+    for (const m of it.mediaContent) if (m?.$?.url) return m.$.url;
+  }
+  if (it.mediaThumbnail?.$?.url) return it.mediaThumbnail.$.url;
+  const html = it['content:encoded'] || it.content || '';
+  const m = html.match(/<img[^>]+src=["']([^"']+)["']/i);
+  return m ? m[1] : null;
+}
 
 export const rssAdapter: SourceAdapter = {
   type: 'rss',
@@ -36,6 +53,7 @@ export const rssAdapter: SourceAdapter = {
             publishedAt: pub,
             summary: summary ? summary.slice(0, 2000) : null,
             text: summary || null,
+            image: extractImage(it),
             raw: { feed: feed.title, categories: it.categories ?? [] },
           });
         }

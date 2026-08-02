@@ -30,7 +30,7 @@ export function buildDraftPage(date: string, drafts: DraftCard[]): string {
       <h2>${esc(d.title)}</h2>
       <pre class="body">${esc(d.body)}</pre>
       <div class="tags">${esc(tagline)}</div>
-      <div class="meta">出处：${esc(d.attribution)} · <a href="${esc(d.sourceUrl)}" target="_blank">原文</a></div>
+      <div class="meta">出处：${esc(d.attribution)}</div>
       <button class="copy" data-text="${fullAttr}">📋 复制文案(标题+正文+标签)</button>
     </div>
   </article>`;

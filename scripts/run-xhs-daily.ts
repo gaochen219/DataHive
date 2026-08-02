@@ -2,7 +2,7 @@
 // 用法：node --env-file=.env --import tsx scripts/run-xhs-daily.ts [篇数=5]
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { recentHealingItems, makeXhsNote } from '../server/enrich/xhs-note';
-import { renderCover } from '../server/cover';
+import { makeCover } from '../server/cover';
 import { buildDraftPage, type DraftCard } from '../server/deliver/draft-page';
 import { putObject, getSignedUrl } from '../server/storage/oss';
 import { pushWeChat } from '../server/deliver/serverchan';
@@ -11,7 +11,7 @@ import { closePool } from '../server/storage/db';
 const N = Number(process.argv[2]) || 5;
 const date = new Date().toISOString().slice(0, 10);
 const daySeed = Math.floor(Date.now() / 86400000); // 每天换一组风格起点
-const FOOTER = '@你的账号 · 每日治愈';
+const FOOTER = '@山海与书 · 每日治愈';
 
 const items = await recentHealingItems(N);
 console.log(`取 ${items.length} 篇疗愈内容，生成笔记+封面...`);
@@ -25,11 +25,12 @@ for (let i = 0; i < items.length; i++) {
     console.log('  跳过(生成失败):', items[i].title);
     continue;
   }
-  const { png, styleName } = await renderCover({
+  const { png, styleName } = await makeCover({
     quote: note.quote,
     attribution: note.attribution,
     footer: FOOTER,
     seed: daySeed + i,
+    imageUrl: items[i].image_url,
   });
   cards.push({
     title: note.title,

@@ -21,6 +21,7 @@ export interface ContentItem {
   comment_count?: number | null;
   content_oss_key?: string | null;
   content_text?: string | null;
+  image_url?: string | null;
   status?: number;
 }
 
@@ -47,8 +48,8 @@ export async function upsertContentItem(item: ContentItem): Promise<void> {
       (content_sn, source_type, source_id, source_name, title, author, url,
        published_at, summary, category, tags, lang,
        read_count, like_count, share_count, comment_count,
-       content_oss_key, content_text, status, fetched_at)
-    VALUES (?,?,?,?,?,?,?, ?,?,?,?,?, ?,?,?,?, ?,?,?, NOW())
+       content_oss_key, content_text, image_url, status, fetched_at)
+    VALUES (?,?,?,?,?,?,?, ?,?,?,?,?, ?,?,?,?, ?,?,?,?, NOW())
     ON DUPLICATE KEY UPDATE
       source_name=VALUES(source_name), title=VALUES(title), author=VALUES(author),
       published_at=VALUES(published_at), summary=VALUES(summary),
@@ -56,14 +57,14 @@ export async function upsertContentItem(item: ContentItem): Promise<void> {
       read_count=VALUES(read_count), like_count=VALUES(like_count),
       share_count=VALUES(share_count), comment_count=VALUES(comment_count),
       content_oss_key=VALUES(content_oss_key), content_text=VALUES(content_text),
-      status=VALUES(status), fetched_at=NOW()`;
+      image_url=VALUES(image_url), status=VALUES(status), fetched_at=NOW()`;
   await query(sql, [
     item.content_sn, item.source_type, item.source_id ?? null, item.source_name ?? null,
     item.title, item.author ?? null, item.url,
     item.published_at ?? null, item.summary ?? null, item.category ?? null,
     item.tags ?? null, item.lang ?? null,
     item.read_count ?? null, item.like_count ?? null, item.share_count ?? null, item.comment_count ?? null,
-    item.content_oss_key ?? null, item.content_text ?? null, item.status ?? 1,
+    item.content_oss_key ?? null, item.content_text ?? null, item.image_url ?? null, item.status ?? 1,
   ]);
 }
 

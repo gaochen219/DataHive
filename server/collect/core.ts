@@ -60,6 +60,7 @@ export async function collect(
         comment_count: item.metrics?.comment ?? null,
         content_oss_key: ossKey,
         content_text: item.text ?? null,
+        image_url: item.image ?? null,
         status: 1,
       };
       await upsertContentItem(row);

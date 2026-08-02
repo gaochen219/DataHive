@@ -116,3 +116,60 @@ export async function renderCover(o: {
   const png = await sharp(Buffer.from(svg)).png().toBuffer();
   return { png, styleName: style.name };
 }
+
+// 照片背景封面：源图裁成 3:4 + 暗纱蒙层 + 白字
+export async function renderPhotoCover(
+  imageBuffer: Buffer,
+  o: { quote: string; attribution: string; footer: string },
+): Promise<Buffer> {
+  const bg = await sharp(imageBuffer).resize(W, H, { fit: 'cover', position: 'attention' }).toBuffer();
+  const lines = wrapCJK(o.quote, 9);
+  const fs = lines.length <= 2 ? 92 : lines.length === 3 ? 78 : 64;
+  const lh = fs * 1.5;
+  const blockH = lines.length * lh;
+  let y = H / 2 - blockH / 2 + fs * 0.8;
+  const quoteSvg = lines
+    .map((l) => {
+      const t = `<text x="${W / 2}" y="${y.toFixed(0)}" font-family="${SERIF}" font-weight="600" font-size="${fs}" fill="#ffffff" paint-order="stroke" stroke="#00000066" stroke-width="3" text-anchor="middle">${esc(l)}</text>`;
+      y += lh;
+      return t;
+    })
+    .join('');
+  const srcY = (H / 2 + blockH / 2 + 90).toFixed(0);
+  const overlay = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">
+    <defs><linearGradient id="scrim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#000000" stop-opacity="0.15"/>
+      <stop offset="0.5" stop-color="#000000" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0.4"/></linearGradient></defs>
+    <rect width="${W}" height="${H}" fill="url(#scrim)"/>
+    ${quoteSvg}
+    <text x="${W / 2}" y="${srcY}" font-family="${SANS}" font-size="40" fill="#ffffffdd" text-anchor="middle">${esc(o.attribution)}</text>
+    <text x="${W / 2}" y="${H - 96}" font-family="${SANS}" font-size="30" fill="#ffffffbb" text-anchor="middle">${esc(o.footer)}</text>
+  </svg>`;
+  return sharp(bg).composite([{ input: Buffer.from(overlay), top: 0, left: 0 }]).png().toBuffer();
+}
+
+// 自动分派：有配图→照片背景；否则→文字卡(按种子轮换)
+export async function makeCover(o: {
+  quote: string;
+  attribution: string;
+  footer: string;
+  seed: number;
+  imageUrl?: string | null;
+}): Promise<{ png: Buffer; styleName: string }> {
+  if (o.imageUrl) {
+    try {
+      const r = await fetch(o.imageUrl, { signal: AbortSignal.timeout(12000) });
+      if (r.ok) {
+        const buf = Buffer.from(await r.arrayBuffer());
+        if (buf.length > 3000) {
+          const png = await renderPhotoCover(buf, o);
+          return { png, styleName: '照片背景' };
+        }
+      }
+    } catch {
+      /* 下载失败则退回文字卡 */
+    }
+  }
+  return renderCover(o);
+}
