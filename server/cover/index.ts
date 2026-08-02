@@ -10,7 +10,7 @@ function esc(s: string): string {
 }
 
 // 中文按字数折行，优先在标点处断
-function wrapCJK(text: string, maxChars: number): string[] {
+export function wrapCJK(text: string, maxChars: number): string[] {
   const lines: string[] = [];
   let s = (text || '').trim();
   while (s.length > maxChars) {
