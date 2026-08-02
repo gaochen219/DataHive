@@ -44,12 +44,13 @@ function getPublicClient(): OSS {
 export async function putObject(
   key: string,
   body: Buffer | string,
-  opts?: { contentType?: string },
+  opts?: { contentType?: string; disposition?: string },
 ): Promise<string> {
   const buf = Buffer.isBuffer(body) ? body : Buffer.from(body);
-  await getOssClient().put(key, buf, {
-    headers: opts?.contentType ? { 'Content-Type': opts.contentType } : undefined,
-  } as any);
+  const headers: Record<string, string> = {};
+  if (opts?.contentType) headers['Content-Type'] = opts.contentType;
+  if (opts?.disposition) headers['Content-Disposition'] = opts.disposition;
+  await getOssClient().put(key, buf, { headers } as any);
   return key;
 }
 
