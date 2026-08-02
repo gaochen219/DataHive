@@ -16,6 +16,22 @@ export async function listEnabledSources(type: string): Promise<SourceConfig[]> 
   }));
 }
 
+export async function getSource(source_id: string): Promise<SourceConfig | null> {
+  const rows = await query<any[]>(
+    'SELECT source_type, source_id, name, sync_cursor, config FROM source WHERE source_id=? LIMIT 1',
+    [source_id],
+  );
+  if (!rows.length) return null;
+  const r = rows[0];
+  return {
+    source_type: r.source_type,
+    source_id: r.source_id,
+    name: r.name,
+    sync_cursor: r.sync_cursor,
+    config: typeof r.config === 'string' ? JSON.parse(r.config) : r.config,
+  };
+}
+
 export async function upsertSource(s: {
   source_type: string;
   source_id: string;
