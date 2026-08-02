@@ -36,8 +36,8 @@ export async function renderContentPages(
   opts: { footer: string; seed: number },
 ): Promise<{ pngs: Buffer[]; paperName: string }> {
   const paper = PAPERS[((opts.seed % PAPERS.length) + PAPERS.length) % PAPERS.length];
-  const M = 120, TOP = 200, fs = 42, lh = fs * 1.95, maxChars = 20;
-  const maxLines = Math.floor((H - TOP - 180) / lh);
+  const M = 120, fs = 42, lh = Math.round(fs * 2.0), maxChars = 20;
+  const maxLines = Math.floor((H - 380) / lh); // 上下各留约 190
 
   // 段落 → 行(段间插空行)
   const paras = stripEmoji(body).split(/\n+/).map((p) => p.trim()).filter(Boolean);
@@ -46,14 +46,27 @@ export async function renderContentPages(
     if (pi > 0) items.push('');
     for (const l of wrapCJK(p, maxChars)) items.push(l);
   });
-  const pages: string[][] = [];
-  for (let i = 0; i < items.length; i += maxLines) pages.push(items.slice(i, i + maxLines));
-  if (!pages.length) pages.push(['']);
+  // 均衡分页：先算页数，再平均分，避免最后一页只剩一两行
+  const pageCount = Math.max(1, Math.ceil(items.length / maxLines));
+  const per = Math.ceil(items.length / pageCount);
+  let pages: string[][] = [];
+  for (let i = 0; i < items.length; i += per) pages.push(items.slice(i, i + per));
+  // 去掉每页首尾空行
+  pages = pages
+    .map((pg) => {
+      const a = [...pg];
+      while (a.length && !a[0]) a.shift();
+      while (a.length && !a[a.length - 1]) a.pop();
+      return a;
+    })
+    .filter((a) => a.length);
+  if (!pages.length) pages = [['']];
 
   const total = pages.length;
   const pngs: Buffer[] = [];
   for (let pi = 0; pi < total; pi++) {
-    let y = TOP;
+    const blockH = pages[pi].length * lh;
+    let y = Math.round((H - blockH) / 2 + fs * 0.72); // 垂直居中，阅读更舒适
     const lineSvg = pages[pi]
       .map((l) => {
         const t = l ? `<text x="${M}" y="${y.toFixed(0)}" font-family="${SERIF}" font-size="${fs}" fill="${paper.ink}">${esc(l)}</text>` : '';

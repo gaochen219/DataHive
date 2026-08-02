@@ -35,9 +35,12 @@ export function buildDraftPage(date: string, drafts: DraftCard[]): string {
     <div class="cap">
       <h2>${esc(d.title)}</h2>
       <div class="tags">${esc(tagline)}</div>
-      <div class="meta">出处：${esc(d.attribution)} · 共 ${d.images.length} 张图</div>
-      <button class="copy" data-text="${capAttr}">📋 复制标题+标签</button>
-      <div class="hint">正文已排进图片，下载图直接发；标题+标签复制到正文框即可。</div>
+      <div class="meta">出处：${esc(d.attribution)}</div>
+      <div class="btns">
+        <button class="dlall">⬇ 下载全部图片(${d.images.length})</button>
+        <button class="copy" data-text="${capAttr}">📋 复制标题+标签</button>
+      </div>
+      <div class="hint">下载全部图片直接发；标题+标签复制到正文框。（首次下载多图，浏览器可能提示"允许"）</div>
     </div>
   </article>`;
     })
@@ -61,8 +64,10 @@ export function buildDraftPage(date: string, drafts: DraftCard[]): string {
   .cap h2{font-size:19px;margin-bottom:10px}
   .tags{color:#c0392b;font-size:14px;margin-bottom:8px}
   .meta{color:#999;font-size:13px;margin-bottom:14px}
-  .copy{background:#ff2e4d;color:#fff;border:0;border-radius:22px;padding:11px 20px;font-size:15px;cursor:pointer}
-  .copy:active{transform:scale(.98)}.copy.done{background:#2ecc71}
+  .btns{display:flex;flex-wrap:wrap;gap:10px}
+  .copy,.dlall{color:#fff;border:0;border-radius:22px;padding:11px 20px;font-size:15px;cursor:pointer}
+  .copy{background:#ff2e4d}.dlall{background:#3a3a3a}
+  .copy:active,.dlall:active{transform:scale(.98)}.copy.done{background:#2ecc71}
   .hint{color:#aaa;font-size:12px;margin-top:10px}
 </style></head><body>
 <header><h1>🌿 山海与书 · 草稿 ${date}（${drafts.length} 篇）</h1>
@@ -77,6 +82,13 @@ document.querySelectorAll('.copy').forEach(function(b){
       var o=b.textContent;b.textContent='✅ 已复制';b.classList.add('done');
       setTimeout(function(){b.textContent=o;b.classList.remove('done');},1800);
     });
+  });
+});
+document.querySelectorAll('.dlall').forEach(function(b){
+  b.addEventListener('click',function(){
+    var links=b.closest('.card').querySelectorAll('.im .dl');
+    links.forEach(function(a,i){ setTimeout(function(){ a.click(); }, i*350); });
+    var o=b.textContent;b.textContent='⬇ 下载中…';setTimeout(function(){b.textContent=o;},links.length*350+400);
   });
 });
 </script>
