@@ -60,12 +60,20 @@ export async function makeXhsNote(item: {
 export async function recentHealingItems(
   limit = 3,
   offset = 0,
-): Promise<Array<{ title: string; summary: string; url: string; image_url: string | null }>> {
-  const n = Math.max(1, Math.min(Math.floor(limit), 10));
+): Promise<Array<{ content_sn: string; title: string; summary: string; url: string; image_url: string | null }>> {
+  const n = Math.max(1, Math.min(Math.floor(limit), 12));
   const off = Math.max(0, Math.floor(offset));
   return query<any[]>(
-    `SELECT title, summary, url, image_url FROM content_item
-     WHERE source_id='healing-daily' AND summary IS NOT NULL AND CHAR_LENGTH(summary) > 60
+    `SELECT content_sn, title, summary, url, image_url FROM content_item
+     WHERE source_id='healing-daily' AND drafted_at IS NULL
+       AND summary IS NOT NULL AND CHAR_LENGTH(summary) > 60
      ORDER BY published_at DESC LIMIT ${n} OFFSET ${off}`,
   );
+}
+
+// 标记这些内容已出过草稿(下次不再选)
+export async function markDrafted(contentSns: string[]): Promise<void> {
+  if (!contentSns.length) return;
+  const ph = contentSns.map(() => '?').join(',');
+  await query(`UPDATE content_item SET drafted_at=NOW() WHERE content_sn IN (${ph})`, contentSns);
 }

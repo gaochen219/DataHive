@@ -1,7 +1,7 @@
 // 小红书每日任务：取疗愈内容 → 笔记 → 封面 + 正文内容图(书感) → 草稿页 → 传OSS → 微信推链接。
 // 用法：node --env-file=.env --import tsx scripts/run-xhs-daily.ts [篇数=5]
 import { writeFileSync, mkdirSync } from 'node:fs';
-import { recentHealingItems, makeXhsNote } from '../server/enrich/xhs-note';
+import { recentHealingItems, makeXhsNote, markDrafted } from '../server/enrich/xhs-note';
 import { makeCover } from '../server/cover';
 import { renderContentPages } from '../server/cover/content-page';
 import { buildDraftPage, type DraftCard } from '../server/deliver/draft-page';
@@ -21,12 +21,14 @@ const items = await recentHealingItems(N, OFFSET);
 console.log(`取 ${items.length} 篇疗愈内容，生成笔记+封面+正文图...`);
 
 const cards: DraftCard[] = [];
+const usedSns: string[] = [];
 for (let i = 0; i < items.length; i++) {
   const note = await makeXhsNote(items[i]);
   if (!note) {
     console.log('  跳过(生成失败):', items[i].title);
     continue;
   }
+  usedSns.push(items[i].content_sn);
   const cover = await makeCover({
     quote: note.quote,
     attribution: note.attribution,
@@ -67,5 +69,6 @@ await pushWeChat(
   `山海与书·草稿·${date}(${cards.length}篇)`,
   `今日 ${cards.length} 篇草稿(封面+正文图)已就绪 🌿\n\n👉 [点开 · 下载图 · 复制标题标签](${url})\n\n电脑打开：下载全部图片直接发；标题+标签复制到正文框。\n(链接 48 小时有效)`,
 );
-console.log(`✅ 已推送微信。草稿页：${url}`);
+await markDrafted(usedSns); // 标记本批已出草稿，下次自动跳过
+console.log(`✅ 已推送微信(已标记 ${usedSns.length} 篇为已出)。草稿页：${url}`);
 await closePool();

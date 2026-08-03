@@ -8,9 +8,12 @@ const FEEDS = [
   'https://www.themarginalian.org/feed/', // Maria Popova · 读书/哲思/治愈
   'https://fs.blog/feed/', // Farnam Street · 思维/成长
   'https://tinybuddha.com/feed/', // Tiny Buddha · 治愈/正念
-  'https://www.positive.news/feed/', // Positive News · 正能量
-  'https://markmanson.net/feed', // Mark Manson · 成长
-  'https://psyche.co/feed', // Psyche(Aeon) · 心理成长美文
+  'https://www.positive.news/feed/', // Positive News · 正能量故事
+  'https://markmanson.net/feed', // Mark Manson · 成长(犀利)
+  'https://psyche.co/feed', // Psyche · 心理成长美文
+  'https://aeon.co/feed.rss', // Aeon · 深度随笔(哲学/科学/文化)
+  'https://www.raptitude.com/feed/', // Raptitude · 生活反思/自我觉察
+  'https://nesslabs.com/feed', // Ness Labs · 正念/成长/效率
 ];
 
 await upsertSource({
